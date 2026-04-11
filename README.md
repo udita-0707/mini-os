@@ -51,7 +51,10 @@ make clean
 | `clear`         | Clear the terminal screen             |
 | `about`         | Display system information            |
 | `meminfo`       | Show memory allocation table          |
-| `memtest`       | Run alloc → write → read → free test |
+| `memtest <text>`| Allocate memory & store text          |
+| `free`          | Free last allocation                  |
+| `free <index>`  | Free specific allocation block        |
+| `calc <a> op <b>`| Test math library (+ - * / %)         |
 | `history`       | Show last 10 commands                 |
 | `exit`          | Shutdown CodeOS                       |
 
@@ -62,27 +65,36 @@ CodeOS > help
   ╔═══════════════════════════════════════════╗
   ║          CodeOS Command Reference         ║
   ╠═══════════════════════════════════════════╣
-  ║  help           Show this help message    ║
-  ║  echo <text>    Print text to screen      ║
-  ║  clear          Clear the screen          ║
-  ║  about          System information        ║
-  ║  meminfo        Memory allocation table   ║
-  ║  memtest        Allocate + free test      ║
-  ║  history        Show command history      ║
-  ║  exit           Shutdown CodeOS           ║
+  ║  help             Show this help message  ║
+  ║  echo <text>      Print text to screen    ║
+  ║  clear            Clear the screen        ║
+  ║  about            System information      ║
+  ║  meminfo          Memory allocation table ║
+  ║  memtest <text>   Allocate & store text   ║
+  ║  free             Free last allocation    ║
+  ║  free <index>     Free specific block     ║
+  ║  calc <a> <op> <b> Test math library      ║
+  ║  history          Show command history    ║
+  ║  exit             Shutdown CodeOS         ║
   ╚═══════════════════════════════════════════╝
 
 CodeOS > echo Hello World
   Hello World
 
-CodeOS > memtest
-  [memtest] Starting memory test...
-  [memtest] Allocated 64 bytes
-  [memtest] Wrote: Hello from virtual RAM!
-  [memtest] Memory used: 64 bytes
-  [memtest] Block freed
-  [memtest] Memory used after free: 0 bytes
-  [memtest] ✓ Memory test passed!
+CodeOS > memtest Hello OS
+  [memtest] Starting dynamic memory test...
+  [memtest] Input: "Hello OS"
+  [memtest] String length: 8 chars
+  [memtest] Allocated 9 bytes in virtual RAM
+  [memtest] Stored: Hello OS
+  [memtest] Tracked as alloc #0
+  [memtest] Memory NOT freed (use 'free' command)
+
+CodeOS > free
+  [free] Freeing alloc #0 ("Hello OS")
+  [free] Releasing 9 bytes
+  [free] Memory freed successfully
+  [free] Memory used: 0 bytes
 
 CodeOS > exit
   Shutting down CodeOS...
