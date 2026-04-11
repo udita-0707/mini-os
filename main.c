@@ -363,6 +363,79 @@ static void cmd_free(char tokens[][MAX_TOKEN_LEN], int token_count) {
   screen_print_line(" bytes");
 }
 
+/*
+ * cmd_calc — Tests the math library interactively.
+ * Usage:
+ *   calc <a> <op> <b>     where op is + - * / %
+ *   calc abs <n>          absolute value
+ *
+ * Examples:
+ *   calc 6 * 3   → 18
+ *   calc 10 / 3  → 3
+ *   calc 10 % 3  → 1
+ *   calc abs -42 → 42
+ */
+static void cmd_calc(char tokens[][MAX_TOKEN_LEN], int token_count) {
+  /* calc abs <n> */
+  if (token_count == 3 && str_compare(tokens[1], "abs") == 0) {
+    int n = str_to_int(tokens[2]);
+    int result = math_abs(n);
+    screen_print("  abs(");
+    screen_print_int(n);
+    screen_print(") = ");
+    screen_print_int(result);
+    screen_newline();
+    return;
+  }
+
+  /* calc <a> <op> <b> */
+  if (token_count < 4) {
+    screen_print_line("  Usage: calc <a> <op> <b>  (op: + - * / %)");
+    screen_print_line("         calc abs <n>");
+    return;
+  }
+
+  int a = str_to_int(tokens[1]);
+  int b = str_to_int(tokens[3]);
+  char op = tokens[2][0];
+  int result = 0;
+
+  if (op == '+') {
+    result = a + b;
+  } else if (op == '-') {
+    result = a - b;
+  } else if (op == '*') {
+    result = math_multiply(a, b);
+  } else if (op == '/') {
+    if (b == 0) {
+      screen_print_line("ERROR: Division by zero");
+      return;
+    }
+    result = math_divide(a, b);
+  } else if (op == '%') {
+    if (b == 0) {
+      screen_print_line("ERROR: Modulo by zero");
+      return;
+    }
+    result = math_modulo(a, b);
+  } else {
+    screen_print("ERROR: Unknown operator '");
+    screen_print(tokens[2]);
+    screen_print_line("'. Use + - * / %");
+    return;
+  }
+
+  screen_print("  ");
+  screen_print_int(a);
+  screen_print(" ");
+  screen_print(tokens[2]);
+  screen_print(" ");
+  screen_print_int(b);
+  screen_print(" = ");
+  screen_print_int(result);
+  screen_newline();
+}
+
 /* ══════════════════════════════════════════════════════════════════ */
 /*                     BOOT SEQUENCE                                 */
 /* ══════════════════════════════════════════════════════════════════ */
@@ -480,6 +553,8 @@ static void shell_run(void) {
       screen_newline();
       cmd_free(tokens, token_count);
       screen_newline();
+    } else if (str_compare(tokens[0], "calc") == 0) {
+      cmd_calc(tokens, token_count);
     } else if (str_compare(tokens[0], "history") == 0) {
       screen_newline();
       history_print();
