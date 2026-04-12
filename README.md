@@ -106,12 +106,20 @@ CodeOS > exit
 
 ```
 mini-os/
-├── string.h / string.c       # Custom string operations
-├── memory.h / memory.c       # Virtual RAM & allocator
-├── math.h   / math.c         # Math without <math.h>
-├── screen.h / screen.c       # Screen output driver
-├── keyboard.h / keyboard.c   # Keyboard input driver
-├── main.c                    # Boot sequence & shell
+├── src/                      # Source files
+│   ├── string.c
+│   ├── memory.c
+│   ├── math.c
+│   ├── screen.c
+│   ├── keyboard.c
+│   └── main.c
+├── include/                  # Header files
+│   ├── string.h
+│   ├── memory.h
+│   ├── math.h
+│   ├── screen.h
+│   └── keyboard.h
+├── build/                    # Compiled object files (generated)
 ├── Makefile                  # Build system
 └── README.md
 ```
