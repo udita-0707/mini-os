@@ -102,6 +102,10 @@ CodeOS > exit
   Goodbye!
 ```
 
+https://github.com/user-attachments/assets/28d7784f-5fff-4e3a-9bf8-8512244de1e2
+
+
+
 ## Project Structure
 
 ```
