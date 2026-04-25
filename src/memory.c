@@ -13,18 +13,13 @@
 #include <stdlib.h>   /* ONLY for initial malloc/free of virtual RAM */
 #include "memory.h"
 #include "string.h"
+#include "math.h"
 
 /* The virtual RAM — a single contiguous block of bytes */
 static char *virtual_ram = NULL;
 
 /* ── Helpers ──────────────────────────────────────────────────────── */
 
-/* Align size up to MEM_ALIGN boundary */
-static int align_up(int size) {
-    int remainder = size % MEM_ALIGN;
-    if (remainder == 0) return size;
-    return size + (MEM_ALIGN - remainder);
-}
 
 /* ── mem_init ─────────────────────────────────────────────────────── */
 void mem_init(void) {
@@ -68,8 +63,8 @@ void* mem_alloc(int size) {
         return NULL;
     }
 
-    /* Align requested size */
-    int aligned_size = align_up(size);
+    /* Align requested size using math library */
+    int aligned_size = math_align_up(size, MEM_ALIGN);
     int header_size = (int)sizeof(MemBlockHeader);
 
     int offset = 0;

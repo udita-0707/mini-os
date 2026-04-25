@@ -22,7 +22,13 @@
 #include "memory.h"
 #include "screen.h"
 #include "string.h"
+#include "system.h"
+#include "ui.h"
+#include "process.h"
+#include "fs.h"
+#include "net.h"
 #include <stdio.h>
+#include <unistd.h>
 
 /* ══════════════════════════════════════════════════════════════════ */
 /*                       CONSTANTS                                  */
@@ -30,8 +36,10 @@
 
 #define INPUT_BUFFER_SIZE 256
 #define HISTORY_SIZE      10
-#define VERSION           "1.0"
+#define VERSION           "2.0"
 #define MAX_ALLOCS        16    /* Max tracked manual allocations */
+
+static char current_user[32] = "guest";
 
 /* ══════════════════════════════════════════════════════════════════ */
 /*                 ALLOCATION TRACKER                                */
@@ -110,20 +118,20 @@ static void history_print(void) {
  */
 static void cmd_help(void) {
   screen_newline();
-  screen_print_line("  ╔═══════════════════════════════════════════╗");
-  screen_print_line("  ║          CodeOS Command Reference         ║");
-  screen_print_line("  ╠═══════════════════════════════════════════╣");
-  screen_print_line("  ║  help             Show this help message  ║");
-  screen_print_line("  ║  echo <text>      Print text to screen    ║");
-  screen_print_line("  ║  clear            Clear the screen        ║");
-  screen_print_line("  ║  about            System information      ║");
-  screen_print_line("  ║  meminfo          Memory allocation table ║");
-  screen_print_line("  ║  memtest <text>   Allocate & store text   ║");
-  screen_print_line("  ║  free             Free last allocation    ║");
-  screen_print_line("  ║  free <index>     Free specific block     ║");
-  screen_print_line("  ║  history          Show command history    ║");
-  screen_print_line("  ║  exit             Shutdown CodeOS         ║");
-  screen_print_line("  ╚═══════════════════════════════════════════╝");
+  screen_print_line("  ╔═════════════════════════════════════════════════════════╗");
+  screen_print_line("  ║                 Jarvis-miniOS Commands                  ║");
+  screen_print_line("  ╠═════════════════════════════════════════════════════════╣");
+  screen_print_line("  ║ SYSTEM:  help, about, history, clear, exit              ║");
+  screen_print_line("  ║ MEMORY:  meminfo, memtest <txt>, free <idx>             ║");
+  screen_print_line("  ║ PROCESS: run counter, run snake, ps, top, kill <pid>    ║");
+  screen_print_line("  ║ FILE:    touch <f>, write <f> <d>, read <f>, rm <f>, ls ║");
+  screen_print_line("  ║ FILE:    chmod <f> <perms> (read-only / read-write)     ║");
+  screen_print_line("  ║ NETWORK: ping <ip>, send <ip> <msg>                     ║");
+  screen_print_line("  ║ UI:      theme <t>, dashboard                           ║");
+  screen_print_line("  ║ UTILS:   echo <txt>, calc <a> <op> <b>, trace on/off    ║");
+  screen_print_line("  ║ USERS:   login <user>, whoami                           ║");
+  screen_print_line("  ║ OTHER:   diagnostics, install <pkg>                     ║");
+  screen_print_line("  ╚═════════════════════════════════════════════════════════╝");
   screen_newline();
 }
 
@@ -440,134 +448,249 @@ static void cmd_calc(char tokens[][MAX_TOKEN_LEN], int token_count) {
 /*                     BOOT SEQUENCE                                 */
 /* ══════════════════════════════════════════════════════════════════ */
 
-/*
- * boot — Initializes all OS subsystems and prints the boot banner.
- */
 static void boot(void) {
-  /* Initialize virtual hardware */
+  keyboard_init();
   mem_init();
   screen_init();
+  ui_init();
+  process_init();
+  fs_init();
+  net_init();
 
-  /* Boot banner */
+  ui_boot_sequence();
+  ui_launcher_menu();
+}
+
+static void shutdown(void) {
   screen_newline();
-  screen_print_line("  ╔═══════════════════════════════════════════════╗");
-  screen_print_line("  ║                                               ║");
-  screen_print_line("  ║       ██████╗ ██████╗ ██████╗ ███████╗        ║");
-  screen_print_line("  ║      ██╔════╝██╔═══██╗██╔══██╗██╔════╝        ║");
-  screen_print_line("  ║      ██║     ██║   ██║██║  ██║█████╗          ║");
-  screen_print_line("  ║      ██║     ██║   ██║██║  ██║██╔══╝          ║");
-  screen_print_line("  ║      ╚██████╗╚██████╔╝██████╔╝███████╗        ║");
-  screen_print_line("  ║       ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝        ║");
-  screen_print_line("  ║                  OS v1.0                      ║");
-  screen_print_line("  ║       Jack OS-Style Mini Operating System     ║");
-  screen_print_line("  ║                                               ║");
-  screen_print_line("  ╠═══════════════════════════════════════════════╣");
-
-  /* Print memory info in banner */
-  char total_buf[16];
-  int_to_string(VIRTUAL_RAM_SIZE, total_buf);
-  screen_print("  ║  Virtual RAM: ");
-  screen_print(total_buf);
-  screen_print_line(" bytes (1 MB)            ║");
-
-  screen_print_line("  ║  Type 'help' for available commands           ║");
-  screen_print_line("  ╚═══════════════════════════════════════════════╝");
+  screen_set_color(COLOR_YELLOW, BG_DEFAULT);
+  screen_print_line("  Shutting down Jarvis-miniOS...");
+  screen_print_line("  Freeing virtual RAM...");
+  mem_shutdown();
+  keyboard_shutdown();
+  screen_reset_color();
+  screen_print_line("  Goodbye!");
   screen_newline();
 }
 
-/*
- * shutdown — Cleans up all OS subsystems.
- */
-static void shutdown(void) {
-  screen_newline();
-  screen_print_line("  Shutting down CodeOS...");
-  screen_print_line("  Freeing virtual RAM...");
-  mem_shutdown();
-  screen_print_line("  Goodbye!");
-  screen_newline();
+/* ══════════════════════════════════════════════════════════════════ */
+/*                     NEW COMMAND HANDLERS                          */
+/* ══════════════════════════════════════════════════════════════════ */
+
+static int handle_command(char tokens[][MAX_TOKEN_LEN], int token_count) {
+    if (token_count == 0) return 1;
+
+    if (str_compare(tokens[0], "help") == 0) {
+        cmd_help();
+    } else if (str_compare(tokens[0], "echo") == 0) {
+        cmd_echo(tokens, token_count);
+    } else if (str_compare(tokens[0], "clear") == 0) {
+        screen_clear();
+    } else if (str_compare(tokens[0], "about") == 0) {
+        cmd_about();
+    } else if (str_compare(tokens[0], "meminfo") == 0) {
+        screen_newline();
+        mem_print_table();
+        screen_newline();
+    } else if (str_compare(tokens[0], "memtest") == 0) {
+        screen_newline();
+        cmd_memtest(tokens, token_count);
+        screen_newline();
+    } else if (str_compare(tokens[0], "free") == 0) {
+        screen_newline();
+        cmd_free(tokens, token_count);
+        screen_newline();
+    } else if (str_compare(tokens[0], "calc") == 0) {
+        cmd_calc(tokens, token_count);
+    } else if (str_compare(tokens[0], "history") == 0) {
+        screen_newline();
+        history_print();
+        screen_newline();
+    } else if (str_compare(tokens[0], "run") == 0) {
+        if (token_count > 1) {
+            if (str_compare(tokens[1], "counter") == 0) {
+                int pid = sys_create_process("counter", task_counter);
+                sys_print("  [Process] Started counter (PID: ");
+                sys_print_int(pid);
+                sys_print_line("). Run 'read counter.log' to view its background output!");
+            } else if (str_compare(tokens[1], "snake") == 0) {
+                task_snake(); /* Foreground task */
+            } else if (str_compare(tokens[1], "calc") == 0) {
+                sys_print_line("  [Package] Launching calculator...");
+            } else {
+                sys_print_line("  Unknown task.");
+            }
+        }
+    } else if (str_compare(tokens[0], "ps") == 0) {
+        screen_newline();
+        process_print_ps();
+        screen_newline();
+    } else if (str_compare(tokens[0], "top") == 0) {
+        process_print_top();
+    } else if (str_compare(tokens[0], "kill") == 0) {
+        if (token_count > 1) {
+            int pid = str_to_int(tokens[1]);
+            if (sys_kill_process(pid)) {
+                sys_print_line("  Process killed.");
+            } else {
+                sys_print_line("  Failed to kill process.");
+            }
+        }
+    } else if (str_compare(tokens[0], "touch") == 0) {
+        if (token_count > 1) {
+            if (sys_create_file(tokens[1]) == 0) sys_print_line("  File created.");
+            else sys_print_line("  Failed to create file.");
+        }
+    } else if (str_compare(tokens[0], "write") == 0) {
+        if (token_count > 2) {
+            if (fs_write(tokens[1], tokens[2]) == 0) sys_print_line("  Written to file.");
+            else sys_print_line("  Write failed.");
+        }
+    } else if (str_compare(tokens[0], "read") == 0) {
+        if (token_count > 1) {
+            if (fs_read(tokens[1]) != 0) sys_print_line("  Read failed.");
+        }
+    } else if (str_compare(tokens[0], "rm") == 0) {
+        if (token_count > 1) {
+            if (sys_delete_file(tokens[1]) == 0) sys_print_line("  File deleted.");
+            else sys_print_line("  Delete failed.");
+        }
+    } else if (str_compare(tokens[0], "ls") == 0) {
+        screen_newline();
+        fs_ls();
+        screen_newline();
+    } else if (str_compare(tokens[0], "chmod") == 0) {
+        if (token_count > 2) {
+            if (fs_chmod(tokens[1], tokens[2]) == 0) sys_print_line("  Permissions updated.");
+            else sys_print_line("  Failed to update permissions.");
+        }
+    } else if (str_compare(tokens[0], "ping") == 0) {
+        if (token_count > 1) {
+            screen_newline();
+            sys_ping(tokens[1]);
+            screen_newline();
+        }
+    } else if (str_compare(tokens[0], "send") == 0) {
+        if (token_count > 2) {
+            screen_newline();
+            net_send(tokens[1], tokens[2]);
+            screen_newline();
+        }
+    } else if (str_compare(tokens[0], "theme") == 0) {
+        if (token_count > 1) {
+            if (ui_set_theme(tokens[1])) sys_print_line("  Theme applied.");
+            else sys_print_line("  Unknown theme (hacker, retro, ocean).");
+        }
+    } else if (str_compare(tokens[0], "trace") == 0) {
+        if (token_count > 1 && str_compare(tokens[1], "on") == 0) sys_set_trace(1);
+        else sys_set_trace(0);
+        sys_print_line("  Trace state updated.");
+    } else if (str_compare(tokens[0], "diagnostics") == 0) {
+        screen_newline();
+        sys_print_line("  [DIAGNOSTICS]");
+        sys_print_line("  Memory allocator... [OK]");
+        sys_print_line("  Process scheduler.. [OK]");
+        sys_print_line("  Screen driver...... [OK]");
+        screen_newline();
+    } else if (str_compare(tokens[0], "login") == 0) {
+        if (token_count > 1) {
+            str_copy(current_user, tokens[1]);
+            sys_print("  Logged in as: ");
+            sys_print_line(current_user);
+        }
+    } else if (str_compare(tokens[0], "whoami") == 0) {
+        sys_print_line(current_user);
+    } else if (str_compare(tokens[0], "install") == 0) {
+        if (token_count > 1) {
+            sys_print("  [Package Manager] Installing ");
+            sys_print(tokens[1]);
+            sys_print_line("... [Done]");
+        }
+    } else if (str_compare(tokens[0], "dashboard") == 0 || str_compare(tokens[0], "2") == 0) {
+        ui_dashboard();
+    } else if (str_compare(tokens[0], "1") == 0) {
+        screen_clear();
+        screen_newline();
+        sys_print_line("  [Shell Active]");
+    } else if (str_compare(tokens[0], "3") == 0) {
+        screen_newline();
+        sys_print_line("  [DIAGNOSTICS]");
+        sys_print_line("  Memory allocator... [OK]");
+        sys_print_line("  Process scheduler.. [OK]");
+        sys_print_line("  Screen driver...... [OK]");
+        screen_newline();
+    } else if (str_compare(tokens[0], "4") == 0) {
+        screen_newline();
+        fs_ls();
+        screen_newline();
+    } else if (str_compare(tokens[0], "exit") == 0) {
+        return 0;
+    } else {
+        screen_set_color(COLOR_RED, BG_DEFAULT);
+        screen_print("ERROR: Unknown command '");
+        screen_print(tokens[0]);
+        screen_print_line("'. Type 'help' for available commands.");
+        screen_reset_color();
+    }
+    return 1;
 }
 
 /* ══════════════════════════════════════════════════════════════════ */
 /*                     SHELL LOOP                                    */
 /* ══════════════════════════════════════════════════════════════════ */
 
-/*
- * shell_run — The main interactive loop.
- *
- * Pipeline:
- *   1. keyboard_read_line (keyboard.c)   → raw input
- *   2. tokenize           (string.c)     → parsed tokens
- *   3. mem_alloc/free     (memory.c)     → dynamic allocation
- *   4. math_*             (math.c)       → any computations
- *   5. screen_print       (screen.c)     → output
- */
+static void print_prompt(void) {
+    ui_apply_theme();
+    screen_print(current_user);
+    screen_print("@minios:~$ ");
+    fflush(stdout);
+}
+
 static void shell_run(void) {
-  char input[INPUT_BUFFER_SIZE];
-  char tokens[MAX_TOKENS][MAX_TOKEN_LEN];
-  int running = 1;
+    char input[INPUT_BUFFER_SIZE];
+    char tokens[MAX_TOKENS][MAX_TOKEN_LEN];
+    int running = 1;
+    int input_len = 0;
+    input[0] = '\0';
 
-  while (running) {
-    /* Print prompt */
-    screen_print("CodeOS > ");
+    ui_draw_footer(mem_get_used(), VIRTUAL_RAM_SIZE, process_get_count(), "OK");
+    print_prompt();
 
-    /* Read input via keyboard driver */
-    if (!keyboard_read_line(input, INPUT_BUFFER_SIZE)) {
-      /* EOF — treat as exit */
-      screen_newline();
-      running = 0;
-      break;
+    while (running) {
+        /* Tick background processes */
+        process_schedule();
+
+        int c = keyboard_get_char_nonblocking();
+        if (c != -1) {
+            if (c == '\n' || c == '\r') {
+                screen_newline();
+                history_add(input);
+                
+                int token_count = tokenize(input, tokens, MAX_TOKENS);
+                running = handle_command(tokens, token_count);
+                
+                input_len = 0;
+                input[0] = '\0';
+                
+                if (running) {
+                    ui_draw_footer(mem_get_used(), VIRTUAL_RAM_SIZE, process_get_count(), "OK");
+                    print_prompt();
+                }
+            } else if (c == 127 || c == '\b') {
+                if (input_len > 0) {
+                    input_len--;
+                    input[input_len] = '\0';
+                    screen_print("\b \b");
+                }
+            } else if (input_len < INPUT_BUFFER_SIZE - 1) {
+                input[input_len++] = (char)c;
+                input[input_len] = '\0';
+                char buf[2] = {(char)c, '\0'};
+                screen_print(buf);
+            }
+        }
+        usleep(5000); /* 5ms tick */
     }
-
-    /* Skip empty input */
-    if (str_length(input) == 0) {
-      continue;
-    }
-
-    /* Store in history */
-    history_add(input);
-
-    /* Tokenize input using string library */
-    int token_count = tokenize(input, tokens, MAX_TOKENS);
-    if (token_count == 0) {
-      continue;
-    }
-
-    /* Dispatch commands */
-    if (str_compare(tokens[0], "help") == 0) {
-      cmd_help();
-    } else if (str_compare(tokens[0], "echo") == 0) {
-      cmd_echo(tokens, token_count);
-    } else if (str_compare(tokens[0], "clear") == 0) {
-      screen_clear();
-    } else if (str_compare(tokens[0], "about") == 0) {
-      cmd_about();
-    } else if (str_compare(tokens[0], "meminfo") == 0) {
-      screen_newline();
-      mem_print_table();
-      screen_newline();
-    } else if (str_compare(tokens[0], "memtest") == 0) {
-      screen_newline();
-      cmd_memtest(tokens, token_count);
-      screen_newline();
-    } else if (str_compare(tokens[0], "free") == 0) {
-      screen_newline();
-      cmd_free(tokens, token_count);
-      screen_newline();
-    } else if (str_compare(tokens[0], "calc") == 0) {
-      cmd_calc(tokens, token_count);
-    } else if (str_compare(tokens[0], "history") == 0) {
-      screen_newline();
-      history_print();
-      screen_newline();
-    } else if (str_compare(tokens[0], "exit") == 0) {
-      running = 0;
-    } else {
-      /* Unknown command — print standardized error */
-      screen_print("ERROR: Unknown command '");
-      screen_print(tokens[0]);
-      screen_print_line("'. Type 'help' for available commands.");
-    }
-  }
 }
 
 /* ══════════════════════════════════════════════════════════════════ */

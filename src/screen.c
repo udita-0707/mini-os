@@ -68,3 +68,48 @@ void screen_newline(void) {
     cursor_col = 0;
     fflush(stdout);
 }
+
+/* ── UI & ANSI Extensions ─────────────────────────────────────────── */
+
+void screen_set_color(int fg, int bg) {
+    if (bg == BG_DEFAULT && fg == COLOR_DEFAULT) {
+        screen_reset_color();
+    } else if (bg == BG_DEFAULT) {
+        printf("\033[%dm", fg);
+    } else if (fg == COLOR_DEFAULT) {
+        printf("\033[%dm", bg);
+    } else {
+        printf("\033[%d;%dm", fg, bg);
+    }
+    fflush(stdout);
+}
+
+void screen_reset_color(void) {
+    printf("\033[0m");
+    fflush(stdout);
+}
+
+void screen_set_cursor(int row, int col) {
+    printf("\033[%d;%dH", row, col);
+    fflush(stdout);
+}
+
+void screen_save_cursor(void) {
+    printf("\033[s");
+    fflush(stdout);
+}
+
+void screen_restore_cursor(void) {
+    printf("\033[u");
+    fflush(stdout);
+}
+
+void screen_hide_cursor(void) {
+    printf("\033[?25l");
+    fflush(stdout);
+}
+
+void screen_show_cursor(void) {
+    printf("\033[?25h");
+    fflush(stdout);
+}
