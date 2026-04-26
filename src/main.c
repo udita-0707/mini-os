@@ -653,6 +653,17 @@ static void shell_run(void) {
     int input_len = 0;
     input[0] = '\0';
 
+    /*
+     * history_cursor tracks position while navigating history with arrows.
+     *   -1  means "not navigating" (user is typing a fresh command)
+     *   0   means the oldest visible history entry
+     *   history_count-1  means the most recent entry
+     */
+    int history_cursor = -1;
+    /* Save whatever the user was typing before pressing Up */
+    char saved_input[INPUT_BUFFER_SIZE];
+    saved_input[0] = '\0';
+
     ui_draw_footer(mem_get_used(), VIRTUAL_RAM_SIZE, process_get_count(), "OK");
     print_prompt();
 
@@ -661,37 +672,104 @@ static void shell_run(void) {
         process_schedule();
 
         int c = keyboard_get_char_nonblocking();
-        if (c != -1) {
-            if (c == '\n' || c == '\r') {
-                screen_newline();
-                history_add(input);
-                
-                int token_count = tokenize(input, tokens, MAX_TOKENS);
-                running = handle_command(tokens, token_count);
-                
-                input_len = 0;
-                input[0] = '\0';
-                
-                if (running) {
-                    ui_draw_footer(mem_get_used(), VIRTUAL_RAM_SIZE, process_get_count(), "OK");
-                    print_prompt();
-                }
-            } else if (c == 127 || c == '\b') {
-                if (input_len > 0) {
-                    input_len--;
-                    input[input_len] = '\0';
-                    screen_print("\b \b");
-                }
-            } else if (input_len < INPUT_BUFFER_SIZE - 1) {
-                input[input_len++] = (char)c;
-                input[input_len] = '\0';
-                char buf[2] = {(char)c, '\0'};
-                screen_print(buf);
-            }
+        if (c == -1) {
+            usleep(5000); /* 5ms tick */
+            continue;
         }
+
+        /* ── Enter ────────────────────────────────────────────── */
+        if (c == '\n' || c == '\r') {
+            screen_newline();
+            history_add(input);
+            history_cursor = -1;  /* reset navigation */
+            saved_input[0] = '\0';
+
+            int token_count = tokenize(input, tokens, MAX_TOKENS);
+            running = handle_command(tokens, token_count);
+
+            input_len = 0;
+            input[0] = '\0';
+
+            if (running) {
+                ui_draw_footer(mem_get_used(), VIRTUAL_RAM_SIZE, process_get_count(), "OK");
+                print_prompt();
+            }
+
+        /* ── Backspace ────────────────────────────────────────── */
+        } else if (c == 127 || c == '\b') {
+            if (input_len > 0) {
+                input_len--;
+                input[input_len] = '\0';
+                screen_print("\b \b");
+            }
+            history_cursor = -1; /* typing cancels history nav */
+
+        /* ── Up Arrow — go back in history ───────────────────── */
+        } else if (c == KEY_UP) {
+            if (history_count == 0) {
+                /* nothing to browse */
+            } else {
+                /* First press: save what user was typing */
+                if (history_cursor == -1) {
+                    str_copy(saved_input, input);
+                    history_cursor = history_count - 1;
+                } else if (history_cursor > 0) {
+                    history_cursor--;
+                }
+
+                /* Compute the history slot index */
+                int start = (history_count < HISTORY_SIZE) ? 0 : history_index;
+                int slot  = (start + history_cursor) % HISTORY_SIZE;
+
+                /* Erase current line on terminal */
+                for (int i = 0; i < input_len; i++) screen_print("\b \b");
+
+                /* Copy history entry into input buffer */
+                str_copy(input, history[slot]);
+                input_len = str_length(input);
+
+                /* Reprint the new content */
+                screen_print(input);
+            }
+
+        /* ── Down Arrow — go forward in history ──────────────── */
+        } else if (c == KEY_DOWN) {
+            if (history_cursor == -1) {
+                /* Already at fresh prompt, nothing to do */
+            } else if (history_cursor < history_count - 1) {
+                history_cursor++;
+
+                int start = (history_count < HISTORY_SIZE) ? 0 : history_index;
+                int slot  = (start + history_cursor) % HISTORY_SIZE;
+
+                /* Erase current line */
+                for (int i = 0; i < input_len; i++) screen_print("\b \b");
+
+                str_copy(input, history[slot]);
+                input_len = str_length(input);
+                screen_print(input);
+            } else {
+                /* Reached the bottom — restore what was being typed */
+                for (int i = 0; i < input_len; i++) screen_print("\b \b");
+                str_copy(input, saved_input);
+                input_len = str_length(input);
+                screen_print(input);
+                history_cursor = -1;
+            }
+
+        /* ── Printable character ──────────────────────────────── */
+        } else if (c >= 32 && c < 256 && input_len < INPUT_BUFFER_SIZE - 1) {
+            history_cursor = -1; /* typing cancels history nav */
+            input[input_len++] = (char)c;
+            input[input_len] = '\0';
+            char buf[2] = {(char)c, '\0'};
+            screen_print(buf);
+        }
+
         usleep(5000); /* 5ms tick */
     }
 }
+
 
 /* ══════════════════════════════════════════════════════════════════ */
 /*                          MAIN                                     */

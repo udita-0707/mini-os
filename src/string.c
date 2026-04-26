@@ -63,7 +63,7 @@ void str_concat(char *dest, const char *src) {
 
 /* ── tokenize ─────────────────────────────────────────────────────── */
 /*
- * Splits input by whitespace. Respects multiple consecutive spaces.
+ * Splits input by whitespace. Respects quotes to group words.
  * Fills tokens[0..n-1] with null-terminated strings.
  * Returns the number of tokens found.
  */
@@ -73,7 +73,7 @@ int tokenize(const char *input, char tokens[][MAX_TOKEN_LEN], int max_tokens) {
 
     while (input[i] != '\0' && token_count < max_tokens) {
         /* Skip leading whitespace */
-        while (input[i] == ' ' || input[i] == '\t') {
+        while (input[i] == ' ' || input[i] == '\t' || input[i] == '\n' || input[i] == '\r') {
             i++;
         }
 
@@ -81,10 +81,29 @@ int tokenize(const char *input, char tokens[][MAX_TOKEN_LEN], int max_tokens) {
             break;
         }
 
-        /* Read a token */
         int j = 0;
-        while (input[i] != '\0' && input[i] != ' ' && input[i] != '\t'
-               && j < MAX_TOKEN_LEN - 1) {
+        int in_single_quotes = 0;
+        int in_double_quotes = 0;
+
+        /* Read a token */
+        while (input[i] != '\0' && j < MAX_TOKEN_LEN - 1) {
+            /* Toggle quote state and skip the quote character itself */
+            if (input[i] == '\'' && !in_double_quotes) {
+                in_single_quotes = !in_single_quotes;
+                i++;
+                continue;
+            } else if (input[i] == '"' && !in_single_quotes) {
+                in_double_quotes = !in_double_quotes;
+                i++;
+                continue;
+            }
+
+            /* Stop at whitespace if not inside quotes */
+            if (!in_single_quotes && !in_double_quotes &&
+                (input[i] == ' ' || input[i] == '\t' || input[i] == '\n' || input[i] == '\r')) {
+                break;
+            }
+
             tokens[token_count][j] = input[i];
             i++;
             j++;
