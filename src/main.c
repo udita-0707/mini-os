@@ -35,7 +35,7 @@
 /* ══════════════════════════════════════════════════════════════════ */
 
 #define INPUT_BUFFER_SIZE 256
-#define HISTORY_SIZE      10
+#define HISTORY_SIZE      100
 #define VERSION           "2.0"
 #define MAX_ALLOCS        16    /* Max tracked manual allocations */
 
@@ -90,15 +90,23 @@ static void history_print(void) {
   screen_print_line("  Command History:");
   screen_print_line("  ────────────────");
 
+  /* Oldest entry first */
   int start;
   if (history_count < HISTORY_SIZE) {
     start = 0;
   } else {
-    start = history_index; /* oldest entry */
+    start = history_index; /* oldest entry in circular buffer */
   }
 
-  for (int i = 0; i < history_count; i++) {
-    int idx = math_modulo(start + i, HISTORY_SIZE);
+  /* Show last 50 entries maximum to avoid flooding the screen */
+  int display_count = history_count;
+  int display_start = 0;
+  if (display_count > 50) {
+    display_start = display_count - 50;
+  }
+
+  for (int i = display_start; i < history_count; i++) {
+    int idx = (start + i) % HISTORY_SIZE;
     char num_buf[8];
     int_to_string(i + 1, num_buf);
 
@@ -106,6 +114,13 @@ static void history_print(void) {
     screen_print(num_buf);
     screen_print(". ");
     screen_print_line(history[idx]);
+  }
+
+  /* Show total count if truncated */
+  if (display_start > 0) {
+    screen_print("  (showing last 50 of ");
+    screen_print_int(history_count);
+    screen_print_line(" commands)");
   }
 }
 
