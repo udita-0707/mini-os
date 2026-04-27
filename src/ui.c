@@ -1,6 +1,8 @@
 /*
  * ui.c — User Interface & Branding
  * ==================================
+ * Handles high-level display logic, 
+ * including the themed dashboard, footer, and animated boot sequences.
  */
 
 #include "ui.h"

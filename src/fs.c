@@ -1,6 +1,8 @@
 /*
  * fs.c — Virtual File System
  * ============================
+ * A Virtual File System (VFS) that maps 
+ * logical file names to physical memory addresses.
  */
 
 #include "fs.h"

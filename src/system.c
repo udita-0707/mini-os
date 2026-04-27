@@ -1,6 +1,9 @@
 /*
  * system.c — System Call Layer
  * ==============================
+ * The System Call (Syscall) API. It provides a standardized wrapper around the lower-level modules.
+- **Key Details**: Implements `trace mode`. If tracing is enabled, calls to `sys_print` or `sys_alloc` 
+ will log interception data before executing the underlying function.
  */
 
 #include "system.h"

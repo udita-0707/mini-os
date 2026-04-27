@@ -1,6 +1,7 @@
 /*
  * process.c — Process Management & Scheduler
  * ============================================
+ * Manages concurrent tasks using a cooperative round-robin scheduler.
  */
 
 #include "process.h"

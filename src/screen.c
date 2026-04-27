@@ -3,6 +3,10 @@
  * =============================================
  * Wraps printf behind a device-style API.
  * Upper layers never call printf directly — they go through screen.c.
+ * Hardware abstraction layers.
+ * Key Details: `keyboard.c` uses `termios.h` and `select()` 
+ * to provide non-blocking input (`keyboard_get_char_nonblocking()`), 
+ * which is critical for the cooperative scheduler to work. `screen.c` manages ANSI escape codes for cursor positioning and colored text.
  */
 
 #include <stdio.h>

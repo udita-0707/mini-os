@@ -1,7 +1,9 @@
 /*
  * memory.c — Virtual Memory Manager for CodeOS
  * ===============================================
- * Implements a first-fit allocator over a contiguous byte array.
+ * Acts as the physical RAM layer, tracking a simulated 1MB byte array.
+ * Key Details: Uses a sequential bump-allocator or tracked block strategy. 
+ * It maintains a `MemoryBlock` array to track active pointers, size, and ownership (PID). 
  *
  * Layout:
  *   [MemBlockHeader | payload ... ] [MemBlockHeader | payload ... ] ...

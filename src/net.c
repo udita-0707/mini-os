@@ -1,6 +1,7 @@
 /*
  * net.c — Networking Simulation
  * ===============================
+ * Simulates a network stack by injecting artificial latency before processing messages.
  */
 
 #include "net.h"

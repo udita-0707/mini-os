@@ -1,6 +1,7 @@
 /*
  * math.c — Custom Math Library for JarvisOS
  * =========================================
+ * Utility libraries built from scratch to avoid standard library dependencies.
  * Implements low-level, algorithmic math functions using bitwise
  * operations and optimized loops. No <math.h> dependencies.
  */

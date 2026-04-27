@@ -2,6 +2,8 @@
  * main.c — CodeOS Shell & Boot Sequence
  * ========================================
  * Entry point for the Mini OS simulation.
+ * The entry point. Initializes all drivers, drops into the `shell_run()` infinite loop, and 
+ * tokenizes user input to execute commands.
  *
  * Boot order:
  *   1. Initialize virtual RAM (memory.c)

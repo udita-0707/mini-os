@@ -2,6 +2,7 @@
  * string.c — Custom String Library for CodeOS
  * =============================================
  * Manual implementations of all string operations.
+ * Utility library built from scratch to avoid standard library dependencies.
  * No <string.h> used anywhere.
  */
 
