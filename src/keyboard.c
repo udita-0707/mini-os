@@ -1,5 +1,5 @@
 /*
- * keyboard.c — Keyboard Input Driver for CodeOS
+ * keyboard.c — Keyboard Input Driver for JarvisOS
  * ================================================
  * Uses termios and select to enable non-blocking input
  * required for background tasks and mini-games.
@@ -23,6 +23,7 @@ static struct termios orig_termios;
 static int term_initialized = 0;
 
 /* ── keyboard_init ────────────────────────────────────────────────── */
+// Crucial function. Modifies the POSIX `termios` flags to disable `ICANON` and `ECHO`, switching the terminal into raw mode.
 void keyboard_init(void) {
     if (!term_initialized) {
         tcgetattr(STDIN_FILENO, &orig_termios);
@@ -38,6 +39,7 @@ void keyboard_init(void) {
 }
 
 /* ── keyboard_shutdown ────────────────────────────────────────────── */
+// Restores original `termios` settings before exit.
 void keyboard_shutdown(void) {
     if (term_initialized) {
         tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
@@ -46,6 +48,8 @@ void keyboard_shutdown(void) {
 }
 
 /* ── keyboard_read_line ───────────────────────────────────────────── */
+// A blocking input reader used in older phases. Switches back to canonical mode temporarily to use `fgets`, then restores raw mode.
+// This function is used to read user input from the keyboard and handle various edge cases, such as empty input, end of file, and invalid input.
 int keyboard_read_line(char *buffer, int max_len) {
     if (buffer == NULL || max_len <= 0) return 0;
 
@@ -81,9 +85,10 @@ int keyboard_read_line(char *buffer, int max_len) {
 }
 
 /* ── keyboard_key_pressed ─────────────────────────────────────────── */
+// Uses POSIX `select()` to peek at the input buffer to see if a key is waiting, returning immediately.
 int keyboard_key_pressed(void) {
     struct timeval tv = {0L, 0L};
-    fd_set fds;
+    fd_set fds; //file descriptors
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds);
     return select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv) > 0;
@@ -112,6 +117,8 @@ static int read_byte_nonblocking(void) {
  * and returns the KEY_* constant.  Regular characters are returned
  * as-is.  Returns -1 when no key is waiting.
  */
+// If `key_pressed` is true, reads the character; else returns -1. 
+// The foundation of the multitasking shell.
 int keyboard_get_char_nonblocking(void) {
     if (!keyboard_key_pressed()) return -1;
 

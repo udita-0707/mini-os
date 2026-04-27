@@ -1,5 +1,5 @@
 /*
- * math.c — Custom Math Library for CodeOS
+ * math.c — Custom Math Library for JarvisOS
  * =========================================
  * Implements low-level, algorithmic math functions using bitwise
  * operations and optimized loops. No <math.h> dependencies.

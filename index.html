@@ -538,54 +538,54 @@
 
         <div class="arch-layer shell">
           <div>
-            <div class="layer-label accent-purple">Shell</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;">User-facing interface</div>
+            <div class="layer-label accent-purple">Shell · <span style="font-weight:300;opacity:0.7;">main.c · ui.c</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">User-facing interface — tokenize → handle_command → shell_run loop</div>
           </div>
           <div class="layer-items">
-            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">Parser</span>
-            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">Command Dispatch</span>
-            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">Themed UI</span>
-            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">Dashboard</span>
+            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">tokenize()</span>
+            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">handle_command()</span>
+            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">ui_dashboard()</span>
+            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">ui_boot_sequence()</span>
+            <span class="layer-pill" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">ui_set_theme()</span>
           </div>
         </div>
 
         <div class="arch-layer syscall">
           <div>
-            <div class="layer-label accent-blue">System Calls</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;">Controlled interface boundary</div>
+            <div class="layer-label accent-blue">System Calls · <span style="font-weight:300;opacity:0.7;">system.c</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">Standardised wrappers — intercepts all calls when trace mode is on</div>
           </div>
           <div class="layer-items">
-            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">malloc / free</span>
-            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">open / read / write</span>
-            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">fork / exec / kill</span>
-            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">ps</span>
+            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">sys_alloc / sys_free</span>
+            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">sys_touch / sys_rm</span>
+            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">sys_create_process / sys_kill</span>
+            <span class="layer-pill" style="color:var(--blue);border-color:rgba(88,166,255,0.3);">sys_print / sys_ping</span>
           </div>
         </div>
 
         <div class="arch-layer svc">
           <div>
-            <div class="layer-label accent-green">Services</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;">Core OS subsystems</div>
+            <div class="layer-label accent-green">Services · <span style="font-weight:300;opacity:0.7;">memory.c · fs.c · process.c · net.c</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">Core OS subsystems — each module independent, no cross-calls</div>
           </div>
           <div class="layer-items">
-            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">Allocator</span>
-            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">VFS</span>
-            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">Process Table</span>
-            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">Net Sim</span>
-            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">Diagnostics</span>
+            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">mem_alloc / mem_free</span>
+            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">fs_touch / fs_write / fs_chmod</span>
+            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">process_schedule()</span>
+            <span class="layer-pill" style="color:var(--green);border-color:rgba(0,255,136,0.3);">net_ping / net_send</span>
           </div>
         </div>
 
         <div class="arch-layer hw">
           <div>
-            <div class="layer-label accent-red">Virtual Hardware</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;">Simulated physical layer</div>
+            <div class="layer-label accent-red">Virtual Hardware · <span style="font-weight:300;opacity:0.7;">screen.c · keyboard.c · math.c · string.c</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">HAL — 1MB RAM array, ANSI terminal, non-blocking I/O, custom libs</div>
           </div>
           <div class="layer-items">
-            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">Memory Pool</span>
-            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">Simulated I/O</span>
-            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">Clock</span>
-            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">Custom Libraries</span>
+            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">1MB ram[] array</span>
+            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">screen ANSI</span>
+            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">termios non-blocking</span>
+            <span class="layer-pill" style="color:var(--red);border-color:rgba(247,129,102,0.3);">math.c / string.c</span>
           </div>
         </div>
 
@@ -609,22 +609,22 @@
         <div class="card green" style="display:flex;flex-direction:column;">
           <div class="feat-icon">🧠</div>
           <div class="feat-title">Memory Allocator</div>
-          <div class="feat-body">Custom <span class="mono accent-green">malloc</span> / <span class="mono accent-green">free</span> with free-list, block splitting, and coalescing. Every allocation tracked. Heap state visible with <span class="mono">meminfo</span>.</div>
+          <div class="feat-body">Block-table allocator over a <span class="mono accent-green">1MB ram[]</span> array. Tracks each block's start index, size, and PID owner. <span class="mono accent-green">mem_alloc</span> finds the next free slot; <span class="mono accent-green">mem_free</span> clears the active flag. Inspect live with <span class="mono">meminfo</span>.</div>
         </div>
         <div class="card blue" style="display:flex;flex-direction:column;">
           <div class="feat-icon">📂</div>
           <div class="feat-title">Virtual File System</div>
-          <div class="feat-body">Inode-based VFS. <span class="mono accent-blue">touch</span>, <span class="mono accent-blue">write</span>, <span class="mono accent-blue">read</span>, <span class="mono accent-blue">ls</span> — all fully simulated, zero real disk access. Clean file lifecycle from creation to deletion.</div>
+          <div class="feat-body">In-memory file table mapping names to memory pointers. <span class="mono accent-blue">touch</span>, <span class="mono accent-blue">write</span>, <span class="mono accent-blue">read</span>, <span class="mono accent-blue">chmod</span>, <span class="mono accent-blue">rm</span>, <span class="mono accent-blue">ls</span> — all simulated. <span class="mono">fs_write</span> calls <span class="mono">sys_alloc</span> to store file data in RAM.</div>
         </div>
         <div class="card amber" style="display:flex;flex-direction:column;">
           <div class="feat-icon">⚙️</div>
-          <div class="feat-title">Process Scheduler</div>
-          <div class="feat-body">Cooperative multi-tasking with a real process table. <span class="mono accent-amber">fork</span>, <span class="mono accent-amber">exec</span>, <span class="mono accent-amber">kill</span>, <span class="mono accent-amber">ps</span> — processes have PIDs, states, priorities, and runtimes.</div>
+          <div class="feat-title">Cooperative Scheduler</div>
+          <div class="feat-body">Round-robin scheduler ticks every <span class="mono accent-amber">5ms</span> via <span class="mono">process_schedule()</span>. Each task is a function pointer — it runs, then yields. Commands: <span class="mono accent-amber">run</span>, <span class="mono accent-amber">kill</span>, <span class="mono accent-amber">top</span>. Background tasks like <span class="mono">counter</span> write to VFS concurrently.</div>
         </div>
         <div class="card red" style="display:flex;flex-direction:column;">
           <div class="feat-icon">🔬</div>
           <div class="feat-title">Diagnostics &amp; Trace</div>
-          <div class="feat-body">Trace mode captures every syscall with timestamps. <span class="mono accent-red">memtest</span> stress-tests the allocator across thousands of cycles. Built for debugging, not after the fact.</div>
+          <div class="feat-body"><span class="mono accent-red">trace on</span> intercepts every <span class="mono">sys_print</span> / <span class="mono">sys_alloc</span> call — like <span class="mono">strace</span> in Linux. <span class="mono accent-red">memtest</span> stress-tests the allocator. <span class="mono accent-red">meminfo</span> shows live heap block state.</div>
         </div>
       </div>
     </div>
@@ -641,38 +641,38 @@
       <div class="diff-list">
 
         <div class="diff-row">
-          <div class="diff-accent" style="background:var(--purple);"></div>
-          <div class="diff-icon-wrap" style="background:rgba(192,132,252,0.1);">🖥️</div>
-          <div class="diff-name accent-purple">Themed Terminal UI</div>
-          <div class="diff-desc">ANSI color themes, styled boot sequence, and a consistent prompt — it looks and behaves like a real OS shell, not a toy program.</div>
-        </div>
-
-        <div class="diff-row">
           <div class="diff-accent" style="background:var(--green);"></div>
-          <div class="diff-icon-wrap" style="background:rgba(0,255,136,0.1);">🔍</div>
-          <div class="diff-name accent-green">Transparent Memory Lifecycle</div>
-          <div class="diff-desc">Every block on the heap is visible. Fragmentation, coalescing, free lists — all inspectable live. No black-box allocator.</div>
+          <div class="diff-icon-wrap" style="background:rgba(0,255,136,0.1);">📦</div>
+          <div class="diff-name accent-green">No Standard Libraries</div>
+          <div class="diff-desc">Zero <code style="font-family:var(--mono);font-size:11px;">&lt;string.h&gt;</code>, <code style="font-family:var(--mono);font-size:11px;">&lt;stdlib.h&gt;</code>, or <code style="font-family:var(--mono);font-size:11px;">malloc</code>. Custom <span class="mono">string.c</span> and <span class="mono">math.c</span> built from scratch — proves foundational OS understanding.</div>
         </div>
 
         <div class="diff-row">
           <div class="diff-accent" style="background:var(--amber);"></div>
-          <div class="diff-icon-wrap" style="background:rgba(240,136,62,0.1);">📡</div>
-          <div class="diff-name accent-amber">Trace Mode</div>
-          <div class="diff-desc">Flags every syscall with timestamps. Wasn't planned — I built it because I needed it to debug the scheduler. Now it's a first-class feature.</div>
+          <div class="diff-icon-wrap" style="background:rgba(240,136,62,0.1);">⚡</div>
+          <div class="diff-name accent-amber">Bitwise Math Library</div>
+          <div class="diff-desc">Multiply, divide, power, sqrt — all at <span class="mono accent-amber">O(log N)</span> using bit shifts. Russian Peasant Multiplication, Binary Long Division, Exponentiation by Squaring — no loops.</div>
+        </div>
+
+        <div class="diff-row">
+          <div class="diff-accent" style="background:var(--purple);"></div>
+          <div class="diff-icon-wrap" style="background:rgba(192,132,252,0.1);">⌨️</div>
+          <div class="diff-name accent-purple">Non-blocking I/O Shell</div>
+          <div class="diff-desc"><span class="mono accent-purple">termios</span> raw mode + POSIX <span class="mono accent-purple">select()</span> lets the shell read keystrokes without blocking — enabling background tasks to run concurrently on the same thread.</div>
+        </div>
+
+        <div class="diff-row">
+          <div class="diff-accent" style="background:var(--red);"></div>
+          <div class="diff-icon-wrap" style="background:rgba(247,129,102,0.1);">📡</div>
+          <div class="diff-name accent-red">Trace Mode (like strace)</div>
+          <div class="diff-desc">Every <span class="mono accent-red">sys_print</span> and <span class="mono accent-red">sys_alloc</span> call is intercepted and logged in real time when trace is on — full visibility into the kernel→hardware data pipeline.</div>
         </div>
 
         <div class="diff-row">
           <div class="diff-accent" style="background:var(--blue);"></div>
           <div class="diff-icon-wrap" style="background:rgba(88,166,255,0.1);">📊</div>
-          <div class="diff-name accent-blue">Live Dashboard</div>
-          <div class="diff-desc">One command. Full OS snapshot: processes, memory usage, open files, uptime. The most impressive view in the entire system.</div>
-        </div>
-
-        <div class="diff-row">
-          <div class="diff-accent" style="background:var(--red);"></div>
-          <div class="diff-icon-wrap" style="background:rgba(247,129,102,0.1);">🌐</div>
-          <div class="diff-name accent-red">Network Simulation</div>
-          <div class="diff-desc">Simulated packet routing and socket model. No real network required — pure software abstraction of networking primitives.</div>
+          <div class="diff-name accent-blue">Live Dashboard + Themes</div>
+          <div class="diff-desc">One command renders RAM usage, process count, and system health with a progress bar. Three switchable ANSI themes: <span class="mono accent-blue">hacker</span>, <span class="mono accent-blue">retro</span>, <span class="mono accent-blue">ocean</span> — live, no restart.</div>
         </div>
 
       </div>
@@ -694,31 +694,73 @@
           <div class="term-dot" style="background:#28c840;"></div>
           <div class="term-title">jarvis@miniOS ~ $</div>
         </div>
-        <div class="term-body">
-          <div class="term-block">
-            <div class="term-cmd">memtest --cycles 10000</div>
-            <div class="term-out">Running allocator stress test...<br>[PASS] 0 leaks · 0 corruptions<br>alloc/free cycles: 10,000 ✓</div>
+        <div class="term-body" style="display:flex;flex-direction:column;gap:8px;padding:14px 20px;overflow:auto;">
+
+          <!-- Row 1: Boot + Dashboard -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 20px;">
+            <div class="term-block">
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--purple);text-transform:uppercase;margin-bottom:4px;">① Boot</div>
+              <div class="term-cmd">./Jarvis-miniOS</div>
+              <div class="term-out" style="color:var(--green);">▓▒░ Jarvis-miniOS booting... ░▒▓<br>[matrix sequence] kernel ready ✓</div>
+            </div>
+            <div class="term-block">
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--purple);text-transform:uppercase;margin-bottom:4px;">② Dashboard</div>
+              <div class="term-cmd">dashboard</div>
+              <div class="term-out" style="color:var(--green);">Processes: 2 · Mem: 0% · Files: 0<br>Uptime: 00:00:03 · [live rendering]</div>
+            </div>
           </div>
-          <div class="term-block">
-            <div class="term-cmd">meminfo</div>
-            <div class="term-out">Heap: 64KB total<br>Used: ████░░░░ 38%  (24.5KB)<br>Free: ██████░░ 62%  (39.5KB)<br>Blocks: 12 alloc · 4 free</div>
+
+          <!-- Row 2: Memory lifecycle -->
+          <div style="border-top:1px solid var(--border);padding-top:8px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--amber);text-transform:uppercase;margin-bottom:5px;">③ Memory lifecycle</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 12px;">
+              <div>
+                <div class="term-cmd" style="font-size:10px;">meminfo</div>
+                <div class="term-out">Heap: empty<br>Blocks: 0</div>
+              </div>
+              <div>
+                <div class="term-cmd" style="font-size:10px;">memtest "Defending my capstone!"</div>
+                <div class="term-out">Alloc'd 0x1004<br>26 bytes tracked</div>
+              </div>
+              <div>
+                <div class="term-cmd" style="font-size:10px;">meminfo</div>
+                <div class="term-out">Blocks: 1 alloc<br>[0x1004] USED ✓</div>
+              </div>
+              <div>
+                <div class="term-cmd" style="font-size:10px;">free 0 → meminfo</div>
+                <div class="term-out">Freed 0x1004<br>Heap: empty ✓</div>
+              </div>
+            </div>
           </div>
-          <div class="term-block">
-            <div class="term-cmd">free</div>
-            <div class="term-out">Total:  65536 bytes<br>Used:   25088 bytes<br>Avail:  40448 bytes</div>
+
+          <!-- Row 3: VFS + Multitasking + Trace + Theme -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 20px;border-top:1px solid var(--border);padding-top:8px;">
+            <div class="term-block">
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">④ File system + permissions</div>
+              <div class="term-cmd" style="font-size:10px;">touch secret.txt</div>
+              <div class="term-cmd" style="font-size:10px;">write secret.txt 'Hello Examiner'</div>
+              <div class="term-cmd" style="font-size:10px;">chmod secret.txt 0</div>
+              <div class="term-cmd" style="font-size:10px;">write secret.txt 'Hacked'</div>
+              <div class="term-out" style="color:var(--red);">[ERR] Permission denied ✗</div>
+              <div class="term-cmd" style="font-size:10px;">read secret.txt</div>
+              <div class="term-out" style="color:var(--green);">"Hello Examiner" — intact ✓</div>
+            </div>
+            <div class="term-block">
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--green);text-transform:uppercase;margin-bottom:4px;">⑤ Multitasking</div>
+              <div class="term-cmd" style="font-size:10px;">run counter</div>
+              <div class="term-cmd" style="font-size:10px;">top</div>
+              <div class="term-out">counter [PID:003] running bg ✓</div>
+              <div class="term-cmd" style="font-size:10px;">read counter.log</div>
+              <div class="term-out">tick:1 tick:2 tick:3... [live]</div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--amber);text-transform:uppercase;margin:5px 0 4px;">⑥ Trace</div>
+              <div class="term-cmd" style="font-size:10px;">trace on → echo test → trace off</div>
+              <div class="term-out">[TRACE] write(1,"test\n",5) ✓</div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--purple);text-transform:uppercase;margin:5px 0 4px;">⑦ UI themes</div>
+              <div class="term-cmd" style="font-size:10px;">theme hacker → theme ocean</div>
+              <div class="term-out" style="color:var(--blue);">UI palette switched live ✓</div>
+            </div>
           </div>
-          <div class="term-block">
-            <div class="term-cmd">ps</div>
-            <div class="term-out">PID  NAME      STATE    PRI  TIME<br>001  init      running  0    0.8s<br>002  shell     waiting  1    0.3s<br>003  memtest   done     2    0.1s</div>
-          </div>
-          <div class="term-block">
-            <div class="term-cmd">touch notes.txt &amp;&amp; write notes.txt "hello OS"</div>
-            <div class="term-out">[inode:003] created notes.txt<br>[write] 8 bytes → inode:003<br>Sync OK ✓</div>
-          </div>
-          <div class="term-block">
-            <div class="term-cmd">dashboard</div>
-            <div class="term-out" style="color:var(--green);">Live OS state — processes: 3<br>Memory: 38% · Files open: 1<br>Uptime: 00:02:14 · Events: 47</div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -736,26 +778,26 @@
         <div class="card amber">
           <div class="challenge-num">01</div>
           <div class="card-label accent-amber">Pointer arithmetic</div>
-          <div class="card-title">Memory layout in C</div>
-          <div class="card-body">Casting <span class="mono accent-amber">void*</span>, computing block headers by hand, managing alignment — C forces you to understand memory layout at the byte level. No abstraction to hide behind.</div>
+          <div class="card-title">Working at the byte level</div>
+          <div class="card-body">Casting <span class="mono accent-amber">void*</span>, tracking block start indices into the <span class="mono">ram[]</span> array by hand, managing alignment with <span class="mono">math_align_up</span> — C makes you think in bytes, not objects.</div>
         </div>
         <div class="card green">
           <div class="challenge-num">02</div>
           <div class="card-label accent-green">Allocator design</div>
-          <div class="card-title">Every decision has a cost</div>
-          <div class="card-body">First-fit is fast but fragments. Best-fit reduces waste but costs scan time. Coalescing is critical but hard to get right. Every allocator choice is a performance trade-off.</div>
+          <div class="card-title">Every design choice has a cost</div>
+          <div class="card-body">Using a block-table over a 1MB array keeps things simple, but fragmentation is a real problem — free a block in the middle and that gap stays unless a new alloc fits exactly. No coalescing means OOM can happen with free space still available.</div>
         </div>
         <div class="card blue">
           <div class="challenge-num">03</div>
-          <div class="card-label accent-blue">Interface design</div>
-          <div class="card-title">Modular systems thinking</div>
-          <div class="card-body">The shell shouldn't know how the allocator works internally. Designing clean boundaries between layers — so each component is independently testable — was the hardest non-technical challenge.</div>
+          <div class="card-label accent-blue">Non-blocking shell</div>
+          <div class="card-title">Cooperative multitasking in pure C</div>
+          <div class="card-body">Getting <span class="mono accent-blue">termios</span> raw mode + <span class="mono accent-blue">select()</span> to work so the scheduler could tick every 5ms while the shell stayed responsive — without threads or mutexes — was the trickiest integration problem.</div>
         </div>
         <div class="card purple">
           <div class="challenge-num">04</div>
           <div class="card-label accent-purple">Debugging without tools</div>
           <div class="card-title">Build what you need</div>
-          <div class="card-body">No gdb shortcuts in a simulated OS. Trace mode wasn't planned — I built it because I had no other way to see what was happening. The diagnostics layer exists because I needed it.</div>
+          <div class="card-body">No gdb in a simulated OS. <span class="mono accent-purple">trace mode</span> wasn't in the original design — I built it because I had no other way to see data moving between <span class="mono">system.c</span> and <span class="mono">memory.c</span>. Necessity built the feature.</div>
         </div>
       </div>
     </div>

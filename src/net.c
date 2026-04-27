@@ -22,10 +22,13 @@ static Host host_table[4] = {
     {"10.0.0.5", "db-server", 15}
 };
 
+// Initializes dummy host tables.
+// In a real OS, this would involve setting up network interfaces, ARP tables, etc.
 void net_init(void) {
     /* Nothing to init */
 }
 
+// Helper function to find network destinations.
 static int get_host_idx(const char *ip) {
     for (int i = 0; i < 4; i++) {
         if (str_compare(host_table[i].ip, ip) == 0 || str_compare(host_table[i].hostname, ip) == 0) {
@@ -35,6 +38,7 @@ static int get_host_idx(const char *ip) {
     return -1;
 }
 
+// Simulates an ICMP echo request by calling `usleep()` multiple times based on the target's configured latency.
 int net_ping(const char *ip) {
     int idx = get_host_idx(ip);
     if (idx == -1) {
@@ -63,6 +67,7 @@ int net_ping(const char *ip) {
     return 0;
 }
 
+// Simulates a data packet transfer, using latency loops before confirming delivery.
 int net_send(const char *ip, const char *msg) {
     int idx = get_host_idx(ip);
     if (idx == -1) {

@@ -15,6 +15,7 @@ static Process process_table[MAX_PROCESSES];
 static int next_pid = 1;
 static int current_process_idx = 0;
 
+// Clears the process table.
 void process_init(void) {
     for (int i = 0; i < MAX_PROCESSES; i++) {
         process_table[i].active = 0;
@@ -23,6 +24,7 @@ void process_init(void) {
     process_create("shell", NULL);
 }
 
+// Registers a new function pointer in the scheduler table, assigns a PID, and marks it active.
 int process_create(const char *name, void (*task_func)(void)) {
     for (int i = 0; i < MAX_PROCESSES; i++) {
         if (!process_table[i].active) {
@@ -37,6 +39,7 @@ int process_create(const char *name, void (*task_func)(void)) {
     return -1;
 }
 
+// Marks a PID as inactive, effectively removing it from the execution loop.
 int process_kill(int pid) {
     if (pid == 1) return 0; /* Cannot kill shell */
     for (int i = 0; i < MAX_PROCESSES; i++) {
@@ -48,6 +51,8 @@ int process_kill(int pid) {
     return 0;
 }
 
+// Iterates the process table by 1 step. If the current index is active, it calls the `task_func()`. 
+// Operates on a round-robin cycle.
 void process_schedule(void) {
     /* Simple round-robin: run the next active process that has a task_func */
     int start_idx = current_process_idx;
@@ -61,6 +66,7 @@ void process_schedule(void) {
     } while (current_process_idx != start_idx);
 }
 
+// Returns the number of running processes for the UI dashboard.
 int process_get_count(void) {
     int count = 0;
     for (int i = 0; i < MAX_PROCESSES; i++) {
@@ -69,6 +75,7 @@ int process_get_count(void) {
     return count;
 }
 
+// Prints a formatted table of all active processes.
 void process_print_ps(void) {
     sys_print_line("  PID  NAME      STATUS");
     for (int i = 0; i < MAX_PROCESSES; i++) {
@@ -96,6 +103,7 @@ void process_print_ps(void) {
     }
 }
 
+// A live view simulation that continuously updates the process list until a key is pressed. Demonstrates the scheduler in action.
 void process_print_top(void) {
     /* Live view simulation. We just clear screen and print ps once for the demo, 
        or we could loop until key pressed. Let's do a short loop. */
@@ -103,7 +111,7 @@ void process_print_top(void) {
     for (int ticks = 0; ticks < 10; ticks++) {
         screen_set_cursor(1, 1);
         screen_set_color(COLOR_CYAN, BG_DEFAULT);
-        sys_print_line("  CodeOS Top Utility (Press ANY KEY to exit)");
+        sys_print_line("  JarvisOS Top Utility (Press ANY KEY to exit)");
         screen_reset_color();
         sys_print_line("  ──────────────────────────────────────────");
         process_print_ps();
@@ -121,6 +129,8 @@ void process_print_top(void) {
 
 static int counter_val = 0;
 
+//  The logic for the `run counter` background task.
+//  Uses the VFS `fs_write` to log its state.
 void task_counter(void) {
     counter_val++;
     if (counter_val % 100 == 0) {
